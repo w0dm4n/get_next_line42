@@ -31,8 +31,9 @@ int		main(int argc, char **argv)
 	if (fd != -1)
 	{
 		res = get_next_line(fd, &line);
+		//ft_putnbr(res);
 		res = get_next_line(fd, &line);
-		//res = get_next_line(fd, &line);
+		//ft_putnbr(res);
 	}
 	else
 		ft_putstr(strerror(errno));

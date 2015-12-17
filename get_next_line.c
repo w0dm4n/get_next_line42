@@ -13,43 +13,75 @@
 #include "libft.h"
 #include "get_next_line.h"
 
+char	*add_in_tmp(char *tmp, char *content, int index_end_line)
+{
+	char 	*tmp_2;
+	int 	i;
+	int 	new_len;
+
+	i = 0;
+	new_len = (ft_strlen(tmp) + ft_strlen(content));
+	tmp_2 = (char*)malloc(sizeof(char) * ft_strlen(tmp));
+	while (tmp[i])
+	{
+		tmp_2[i] = tmp[i];
+		i++;
+	}
+	tmp = (char*)malloc(sizeof(char) * (new_len));
+	tmp = ft_strcat(tmp, tmp_2);
+	tmp = ft_strncat(tmp, content, index_end_line);
+	free(tmp_2);
+	return (tmp);
+}
+
 int		get_next_line(int const fd, char **line)
 {
 	int				res;
-	char		*content;
+	char			*content;
+	static char		*tmp;
 	int				index_end_line;
 	int				end_line;
-	int				i;
-	int				tmp_i;
+	int				tmp_len;
+	static int 		line_nbr;
+	int 			line_tmp;
 
 	end_line = 0;
-	i = 0;
+	line_tmp = 0;
 	line = NULL;
-	tmp_i = 0;
+	if (!tmp)
+		tmp = (char*)malloc(sizeof(char));
+	tmp_len = ft_strlen(tmp);
 	content = (char*)malloc(sizeof(char) * (BUFF_SIZE));
 	while ((res = read(fd, content, BUFF_SIZE)) && !end_line)
 	{
-		if (!end_line)
-			index_end_line = 0;
+		index_end_line = 0;
 		while (content[index_end_line])
 		{
-			ft_putchar(content[index_end_line]);
 			if (content[index_end_line] == '\n') // || EOF ??
 			{
-				end_line = 1;
-				break;
+				line_tmp++;
+				ft_putnbr(line_tmp);
+				if (line_tmp == (line_nbr + 1))
+				{
+					end_line = 1;
+					break;
+				}
 			}
 			index_end_line++;
 		}
-		tmp_i = tmp_i + index_end_line;
+		if (line_tmp == (line_nbr + 1))
+			tmp = add_in_tmp(tmp, content, index_end_line);
 	}
-	//ft_putnbr(tmp_i);
-	//while (i < tmp_i)
-	//{
-	//	ft_putchar(content[i]);
-	//	i++;
-	//}
-	//ft_putstr(content);
-	//ft_putnbr(i);
-	return (1);
+	/*line = malloc(sizeof(char*) * ft_strlen(tmp));
+	line = ft_strcpy(*line, tmp); */
+	//ft_putstr(tmp);
+	if (end_line)
+	{
+		line_nbr++;
+		return (1);
+	}
+	else if (!end_line)
+		return (0);
+	else
+		return (-1);
 }
