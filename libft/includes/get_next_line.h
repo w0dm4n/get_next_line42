@@ -17,5 +17,5 @@
 #include <unistd.h>
 #include <fcntl.h>
 int			get_next_line(int const fd, char **line);
-# define BUFF_SIZE 124
+# define BUFF_SIZE 524
 # endif

@@ -15,9 +15,9 @@
 
 char	*add_in_tmp(char *tmp, char *content, int index_end_line)
 {
-	char 	*tmp_2;
-	int 	i;
-	int 	new_len;
+	char	*tmp_2;
+	int		i;
+	int		new_len;
 
 	i = 0;
 	new_len = (ft_strlen(tmp) + ft_strlen(content));
@@ -36,7 +36,7 @@ char	*add_in_tmp(char *tmp, char *content, int index_end_line)
 
 char	*get_line(int line_nbr, char *tmp, int i, int i_2)
 {
-	int 	line;
+	int		line;
 	char	*tmp_line;
 
 	line = 0;
@@ -57,7 +57,24 @@ char	*get_line(int line_nbr, char *tmp, int i, int i_2)
 		i_2++;
 	}
 	tmp_line[i_2] = '\0';
+	if (!i_2 && tmp[i + 1])
+		return (NULL);
 	return (tmp_line);
+}
+
+int		get_state(char *line)
+{
+	if (!line)
+	{
+		line = "\0";
+		return (1);
+	}
+	if (ft_strlen(line))
+		return (1);
+	else if (!ft_strlen(line))
+		return (0);
+	else
+		return (-1);
 }
 
 int		get_next_line(int const fd, char **line)
@@ -65,10 +82,9 @@ int		get_next_line(int const fd, char **line)
 	int				res;
 	char			*content;
 	static char		*tmp;
-	static int 		line_nbr;
+	static int		line_nbr;
 	char			*line_tmp;
 
-	line_tmp = *line;
 	if (!line_nbr)
 		line_nbr = 0;
 	if (!tmp)
@@ -77,7 +93,7 @@ int		get_next_line(int const fd, char **line)
 	while ((res = read(fd, content, BUFF_SIZE)))
 		tmp = add_in_tmp(tmp, content, res);
 	line_tmp = get_line(line_nbr, tmp, 0, 0);
-	ft_putstr(line_tmp);
+	*line = line_tmp;
 	line_nbr++;
-	return (-1);
+	return (get_state(line_tmp));
 }
