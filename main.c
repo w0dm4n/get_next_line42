@@ -31,9 +31,11 @@ int		main(int argc, char **argv)
 	if (fd != -1)
 	{
 		res = get_next_line(fd, &line);
-		//ft_putnbr(res);
+		ft_putstr(line);
 		res = get_next_line(fd, &line);
-		//ft_putnbr(res);
+		ft_putstr("\n");
+		res = get_next_line(fd, &line);
+		
 	}
 	else
 		ft_putstr(strerror(errno));

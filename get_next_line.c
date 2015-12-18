@@ -34,54 +34,50 @@ char	*add_in_tmp(char *tmp, char *content, int index_end_line)
 	return (tmp);
 }
 
+char	*get_line(int line_nbr, char *tmp, int i, int i_2)
+{
+	int 	line;
+	char	*tmp_line;
+
+	line = 0;
+	while (tmp[i])
+	{
+		if (line == line_nbr)
+			break ;
+		if (tmp[i] == '\n')
+			line++;
+		i++;
+	}
+	if (!(tmp_line = (char*)malloc(sizeof(char) * ft_strlen(tmp))))
+		return (NULL);
+	while (tmp[i] != '\n' && tmp[i] != '\0')
+	{
+		tmp_line[i_2] = tmp[i];
+		i++;
+		i_2++;
+	}
+	tmp_line[i_2] = '\0';
+	return (tmp_line);
+}
+
 int		get_next_line(int const fd, char **line)
 {
 	int				res;
 	char			*content;
 	static char		*tmp;
-	int				index_end_line;
-	int				end_line;
-	int				tmp_len;
 	static int 		line_nbr;
-	int 			line_tmp;
+	char			*line_tmp;
 
-	end_line = 0;
-	line_tmp = 0;
-	line = NULL;
+	line_tmp = *line;
+	if (!line_nbr)
+		line_nbr = 0;
 	if (!tmp)
 		tmp = (char*)malloc(sizeof(char));
-	tmp_len = ft_strlen(tmp);
 	content = (char*)malloc(sizeof(char) * (BUFF_SIZE));
-	while ((res = read(fd, content, BUFF_SIZE)) && !end_line)
-	{
-		index_end_line = 0;
-		while (content[index_end_line])
-		{
-			if (content[index_end_line] == '\n') // || EOF ??
-			{
-				line_tmp++;
-				ft_putnbr(line_tmp);
-				if (line_tmp == (line_nbr + 1))
-				{
-					end_line = 1;
-					break;
-				}
-			}
-			index_end_line++;
-		}
-		if (line_tmp == (line_nbr + 1))
-			tmp = add_in_tmp(tmp, content, index_end_line);
-	}
-	/*line = malloc(sizeof(char*) * ft_strlen(tmp));
-	line = ft_strcpy(*line, tmp); */
-	//ft_putstr(tmp);
-	if (end_line)
-	{
-		line_nbr++;
-		return (1);
-	}
-	else if (!end_line)
-		return (0);
-	else
-		return (-1);
+	while ((res = read(fd, content, BUFF_SIZE)))
+		tmp = add_in_tmp(tmp, content, res);
+	line_tmp = get_line(line_nbr, tmp, 0, 0);
+	ft_putstr(line_tmp);
+	line_nbr++;
+	return (-1);
 }
