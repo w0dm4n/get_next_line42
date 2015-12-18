@@ -13,7 +13,7 @@
 #include "libft.h"
 #include "get_next_line.h"
 
-char	*add_in_tmp(char *tmp, char *content, int index_end_line)
+char	*add_in_tmp(char *tmp, char *content, int res)
 {
 	char	*tmp_2;
 	int		i;
@@ -21,15 +21,19 @@ char	*add_in_tmp(char *tmp, char *content, int index_end_line)
 
 	i = 0;
 	new_len = (ft_strlen(tmp) + ft_strlen(content));
-	tmp_2 = (char*)malloc(sizeof(char) * ft_strlen(tmp));
+	if (BUFF_SIZE <= 200)
+		tmp_2 = (char*)malloc(sizeof(char) * (ft_strlen(tmp) + MAX_BUFF));
+	else
+		tmp_2 = (char*)malloc(sizeof(char) * ft_strlen(tmp));
 	while (tmp[i])
 	{
 		tmp_2[i] = tmp[i];
 		i++;
 	}
+	tmp_2[i] = '\0';
 	tmp = (char*)malloc(sizeof(char) * (new_len));
 	tmp = ft_strcat(tmp, tmp_2);
-	tmp = ft_strncat(tmp, content, index_end_line);
+	tmp = ft_strncat(tmp, content, res);
 	free(tmp_2);
 	return (tmp);
 }
@@ -85,6 +89,8 @@ int		get_next_line(int const fd, char **line)
 	static int		line_nbr;
 	char			*line_tmp;
 
+	if (fd == -1)
+		return (-1);
 	if (!line_nbr)
 		line_nbr = 0;
 	if (!tmp)
