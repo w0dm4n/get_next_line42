@@ -18,7 +18,7 @@ LIB_FOLDER = libft/
 
 O_NAME = $(SRCS_NAME:.c=.o)
 
-FLAGS = 
+FLAGS = -Wall -Wextra -Werror
 
 INCLUDE_FOLDER = libft/includes/
 
