@@ -16,7 +16,15 @@
 #include <sys/uio.h>
 #include <unistd.h>
 #include <fcntl.h>
-int			get_next_line(int const fd, char **line);
 # define BUFF_SIZE 1
-# define MAX_BUFF 10000
+
+int			get_next_line(int const fd, char **line);
+
+typedef	struct	s_gnl
+{
+	char	*buffer;
+	int		line;
+	int		already_read;
+}				t_gnl;
+
 # endif

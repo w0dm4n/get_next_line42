@@ -13,93 +13,98 @@
 #include "libft.h"
 #include "get_next_line.h"
 
-char	*add_in_tmp(char *tmp, char *content, int res)
+char	*add_in(char *buffer, char *toadd, int oct, int i)
 {
-	char	*tmp_2;
-	int		i;
 	int		new_len;
+	char	*tmp;
 
+	new_len = (ft_strlen(buffer) + ft_strlen(toadd));
+	if (!(tmp = (char*)malloc(sizeof(char) * (ft_strlen(buffer) + 1))))
+		return (NULL);
+	while (buffer[i])
+	{
+		tmp[i] = buffer[i];
+		i++;
+	}
+	tmp[i] = '\0';
 	i = 0;
-	new_len = (ft_strlen(tmp) + ft_strlen(content));
-	if (BUFF_SIZE <= 200)
-		tmp_2 = (char*)malloc(sizeof(char) * (ft_strlen(tmp) + MAX_BUFF));
-	else
-		tmp_2 = (char*)malloc(sizeof(char) * ft_strlen(tmp));
-	while (tmp[i])
-	{
-		tmp_2[i] = tmp[i];
-		i++;
-	}
-	tmp_2[i] = '\0';
-	tmp = (char*)malloc(sizeof(char) * (new_len));
-	tmp = ft_strcat(tmp, tmp_2);
-	tmp = ft_strncat(tmp, content, res);
-	free(tmp_2);
-	return (tmp);
+	if (!(buffer = (char*)malloc(sizeof(char) * (new_len + 1))))
+		return (NULL);
+	buffer = ft_strcat(buffer, tmp);
+	buffer = ft_strncat(buffer, toadd, oct);
+	free(tmp);
+	return (buffer);
 }
 
-char	*get_line(int line_nbr, char *tmp, int i, int i_2)
+t_gnl	*alloc_list(t_gnl *list)
 {
-	int		line;
-	char	*tmp_line;
+	if (!(list = (t_gnl *)malloc(sizeof(t_gnl*))))
+		return (NULL);
+	else if (!(list->buffer = (char *)malloc(sizeof(char))))
+		return (NULL);
+	ft_bzero(list->buffer, 1);
+	list->already_read = 0;
+	list->line = 0;
+	return (list);
+}
 
-	line = 0;
-	while (tmp[i])
+t_gnl	*read_file(int fd, t_gnl *list, int res)
+{
+	char *content;
+
+	if (!(content = (char *)malloc(sizeof(char) * BUFF_SIZE)))
+		return (NULL);
+	while ((res = read(fd, content, BUFF_SIZE)))
+		if (!(list->buffer = add_in(list->buffer, content, res, 0)))
+			return (NULL);
+	free(content);
+	return (list);
+}
+
+char	*get_line(char *buffer, int line, int i, int i_2)
+{
+	int		line_pos;
+	char	*line_tmp;
+
+	line_pos = 0;
+	while (buffer[i])
 	{
-		if (line == line_nbr)
+		if (line_pos == line)
 			break ;
-		if (tmp[i] == '\n')
-			line++;
+		if (buffer[i] == '\n')
+			line_pos++;
 		i++;
 	}
-	if (!(tmp_line = (char*)malloc(sizeof(char) * ft_strlen(tmp))))
+	if (!(line_tmp = (char*)malloc(sizeof(char) * (ft_strlen(buffer) + 1))))
 		return (NULL);
-	while (tmp[i] != '\n' && tmp[i] != '\0')
-	{
-		tmp_line[i_2] = tmp[i];
-		i++;
-		i_2++;
-	}
-	tmp_line[i_2] = '\0';
-	if (!i_2 && tmp[i + 1])
+	while (buffer[i] != '\n' && buffer[i])
+		line_tmp[i_2++] = buffer[i++];
+	line_tmp[i_2] = '\0';
+	if (!i_2 && buffer[i + 1])
 		return (NULL);
-	return (tmp_line);
-}
-
-int		get_state(char *line)
-{
-	if (!line)
-	{
-		line = "\0";
-		return (1);
-	}
-	if (ft_strlen(line))
-		return (1);
-	else if (!ft_strlen(line))
-		return (0);
-	else
-		return (-1);
+	return (line_tmp);
 }
 
 int		get_next_line(int const fd, char **line)
 {
-	int				res;
-	char			*content;
-	static char		*tmp;
-	static int		line_nbr;
+	static t_gnl	*list;
 	char			*line_tmp;
-
-	if (fd == -1)
-		return (-1);
-	if (!line_nbr)
-		line_nbr = 0;
-	if (!tmp)
-		tmp = (char*)malloc(sizeof(char));
-	content = (char*)malloc(sizeof(char) * (BUFF_SIZE));
-	while ((res = read(fd, content, BUFF_SIZE)))
-		tmp = add_in_tmp(tmp, content, res);
-	line_tmp = get_line(line_nbr, tmp, 0, 0);
+	if (!list)
+		if (!(list = alloc_list(list)))
+			return (-1);
+	if (!list->already_read)
+	{
+		if (!(list = read_file(fd, list, 0)))
+			return (-1);
+		list->already_read++;
+	}
+	line_tmp = get_line(list->buffer, list->line, 0, 0);
 	*line = line_tmp;
-	line_nbr++;
-	return (get_state(line_tmp));
+	list->line++;
+	if (!line_tmp)
+	{
+		line_tmp = "\0";
+		return (1);
+}
+	return ((line_tmp[0] != '\0') ? 1 : 0);
 }
