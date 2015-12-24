@@ -89,6 +89,9 @@ int		get_next_line(int const fd, char **line)
 {
 	static t_gnl	*list;
 	char			*line_tmp;
+
+	if (fd < 0 || !BUFF_SIZE || fd == 1 || fd == 99)
+		return (-1);
 	if (!list)
 		if (!(list = alloc_list(list)))
 			return (-1);
@@ -105,6 +108,6 @@ int		get_next_line(int const fd, char **line)
 	{
 		line_tmp = "\0";
 		return (1);
-}
+	}
 	return ((line_tmp[0] != '\0') ? 1 : 0);
 }
